@@ -7,6 +7,8 @@
 - [概览](#概览)
 - [可用 Skills](#可用-skills)
   - [checkpoint](#checkpoint)
+  - [cursor-cli](#cursor-cli)
+  - [grok-cli](#grok-cli)
 - [新增 Skills](#新增-skills)
 - [仓库结构](#仓库结构)
 
@@ -25,6 +27,14 @@ SnowyAgentSkills 是一个可复用 agent skills 集合仓库.
 - Skills: `checkpoint-save`, `checkpoint-restore`, `checkpoint-handoff`, `checkpoint-status`, `checkpoint-review`.
 
 - 适用范围: All agents.
+
+### [cursor-cli](cursor-cli/SKILL.md)
+
+通过 Cursor 的 agent CLI 执行非交互代码任务, 获取结构化输出并续接会话.
+
+### [grok-cli](grok-cli/SKILL.md)
+
+通过 Grok Build CLI (`grok`) 执行非交互代码任务, 获取结构化输出并续接会话.
 
 ## 新增 Skills
 
@@ -65,6 +75,8 @@ SnowyAgentSkills/
 |-- checkpoint-handoff/
 |-- checkpoint-status/
 |-- checkpoint-review/
+|-- cursor-cli/
+|-- grok-cli/
 |-- README.md
 |-- README.zh-CN.md
 |-- LICENSE
