@@ -1,7 +1,0 @@
-interface:
-  display_name: "Grill Me"
-  short_description: "Grill the user relentlessly about a plan or design."
-  default_prompt: "Use $grill-me to sharpen my plan or design."
-
-policy:
-  allow_implicit_invocation: false

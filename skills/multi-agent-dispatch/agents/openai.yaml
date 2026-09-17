@@ -1,7 +1,0 @@
-interface:
-  display_name: "Multi-Agent Dispatch"
-  short_description: "Delegate the current task through subagents"
-  default_prompt: "Use $multi-agent-dispatch to complete this task through subagents."
-
-policy:
-  allow_implicit_invocation: false

@@ -10,7 +10,7 @@
   - [Checkpoint 文件](#checkpoint-文件)
   - [Review 文件](#review-文件)
 - [使用示例](#使用示例)
-- [能力](#能力)
+- [功能](#功能)
   - [checkpoint-save](#checkpoint-save)
   - [checkpoint-restore](#checkpoint-restore)
   - [checkpoint-handoff](#checkpoint-handoff)
@@ -46,11 +46,11 @@
 
 ## 共享 References
 
-`checkpoint-save` 是 root skill. 它保存共享 references:
+`checkpoint-save` 是 root skill. 它保存共享 references, 以下路径相对于本目录:
 
-- `checkpoint-save/references/file-contracts.md`
-- `checkpoint-save/references/common-rules.md`
-- `checkpoint-save/references/status-summary.md`
+- `references/file-contracts.md`
+- `references/common-rules.md`
+- `references/status-summary.md`
 
 其他 `checkpoint-*` skill 依赖 `checkpoint-save`. 如果这些共享 references 不可用, 依赖 skill 必须停止执行并提示用户先安装 `checkpoint-save`. 不要凭记忆重建契约.
 

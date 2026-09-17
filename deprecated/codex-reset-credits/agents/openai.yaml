@@ -1,4 +1,0 @@
-interface:
-  display_name: "Codex Reset Credits"
-  short_description: "Check Codex rate limit reset credit expirations"
-  default_prompt: "Use $codex-reset-credits to check my available Codex rate limit reset credits and expiration times."

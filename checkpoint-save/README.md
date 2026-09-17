@@ -46,11 +46,11 @@ This family provides five skills:
 
 ## Shared References
 
-`checkpoint-save` is the root skill. It owns the shared references:
+`checkpoint-save` is the root skill. It owns the shared references, relative to this directory:
 
-- `checkpoint-save/references/file-contracts.md`
-- `checkpoint-save/references/common-rules.md`
-- `checkpoint-save/references/status-summary.md`
+- `references/file-contracts.md`
+- `references/common-rules.md`
+- `references/status-summary.md`
 
 Other `checkpoint-*` skills depend on `checkpoint-save`. If these shared references are unavailable, the dependent skill stops and asks the user to install `checkpoint-save` first. It must not rebuild the contracts from memory.
 
