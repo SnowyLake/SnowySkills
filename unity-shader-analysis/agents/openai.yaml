@@ -1,0 +1,7 @@
+interface:
+  display_name: "Unity Shader Analysis"
+  short_description: "Preflight and analyze Unity shader variants with MaliOC"
+  default_prompt: "Use $unity-shader-analysis to verify MaliOC and Unity connectivity first, resolve Unity shader variants, analyze them with MaliOC, and export one Chinese Excel report per Shader."
+
+policy:
+  allow_implicit_invocation: false

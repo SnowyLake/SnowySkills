@@ -1,0 +1,4 @@
+interface:
+  display_name: "Snapdragon Profiler Statistics"
+  short_description: "Build Excel statistics from Snapdragon Profiler CSV files"
+  default_prompt: "Use $snapdragon-profiler-statistics to analyze these scene CSV files and create one formatted Excel workbook."

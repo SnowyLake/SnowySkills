@@ -9,6 +9,8 @@ Language: English | [中文](README.zh-CN.md)
   - [checkpoint](#checkpoint)
   - [cursor-cli](#cursor-cli)
   - [grok-cli](#grok-cli)
+  - [unity-shader-analysis](#unity-shader-analysis)
+  - [snapdragon-profiler-statistics](#snapdragon-profiler-statistics)
 - [Add Skills](#add-skills)
 - [Repository Layout](#repository-layout)
 
@@ -35,6 +37,16 @@ Use Cursor's agent CLI for non-interactive coding tasks, structured output, and 
 ### [grok-cli](grok-cli/SKILL.md)
 
 Use the Grok Build CLI (`grok`) for non-interactive coding tasks, structured output, and session continuation.
+
+### [unity-shader-analysis](unity-shader-analysis/SKILL.md)
+
+- Description: Analyze controlled Unity shader variants with Mali Offline Compiler and export Excel reports with source-backed optimization recommendations.
+- Requirements: PowerShell, Unity Editor with uloop, MaliOC; Node.js with `@oai/artifact-tool` and `jszip` for reports. Explicit invocation only.
+
+### [snapdragon-profiler-statistics](snapdragon-profiler-statistics/SKILL.md)
+
+- Description: Summarize Unity URP Snapdragon Profiler CSV exports into per-scene Excel sheets with Pass Clocks and main-camera ALU/EFU statistics.
+- Requirements: Node.js with `@oai/artifact-tool` and CSV exports containing the supported camera markers.
 
 ## Add Skills
 
@@ -77,6 +89,8 @@ SnowyAgentSkills/
 |-- checkpoint-review/
 |-- cursor-cli/
 |-- grok-cli/
+|-- unity-shader-analysis/
+|-- snapdragon-profiler-statistics/
 |-- README.md
 |-- README.zh-CN.md
 |-- LICENSE

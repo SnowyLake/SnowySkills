@@ -9,6 +9,8 @@
   - [checkpoint](#checkpoint)
   - [cursor-cli](#cursor-cli)
   - [grok-cli](#grok-cli)
+  - [unity-shader-analysis](#unity-shader-analysis)
+  - [snapdragon-profiler-statistics](#snapdragon-profiler-statistics)
 - [新增 Skills](#新增-skills)
 - [仓库结构](#仓库结构)
 
@@ -35,6 +37,16 @@ SnowyAgentSkills 是一个可复用 agent skills 集合仓库.
 ### [grok-cli](grok-cli/SKILL.md)
 
 通过 Grok Build CLI (`grok`) 执行非交互代码任务, 获取结构化输出并续接会话.
+
+### [unity-shader-analysis](unity-shader-analysis/SKILL.md)
+
+- 简介: 使用 Mali Offline Compiler 分析 Unity 受控 Shader 变体, 生成包含源码优化建议的 Excel 报告.
+- 运行前提: PowerShell, 已连接 uloop 的 Unity Editor, MaliOC; 报告生成需要 Node.js、`@oai/artifact-tool` 和 `jszip`. 仅显式调用.
+
+### [snapdragon-profiler-statistics](snapdragon-profiler-statistics/SKILL.md)
+
+- 简介: 将 Unity URP 的 Snapdragon Profiler CSV 汇总为每场景一张 Sheet 的 Excel, 统计 Pass Clocks 与主相机 ALU/EFU.
+- 运行前提: Node.js、`@oai/artifact-tool`, 以及包含受支持相机标记的 CSV.
 
 ## 新增 Skills
 
@@ -77,6 +89,8 @@ SnowyAgentSkills/
 |-- checkpoint-review/
 |-- cursor-cli/
 |-- grok-cli/
+|-- unity-shader-analysis/
+|-- snapdragon-profiler-statistics/
 |-- README.md
 |-- README.zh-CN.md
 |-- LICENSE
