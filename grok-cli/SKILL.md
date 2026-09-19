@@ -15,7 +15,7 @@ description: 调用 Grok Build CLI 执行代码任务, 续接会话或通过 ACP
 
 ## 识别与认证
 
-Grok Build 的入口是 `grok`, 产品名称 `grokbuild` 不代表有同名命令. 用 `--version` / `--help` 核实身份并保存绝对入口路径; 同名 `agent` 也可能属于其他产品.
+Grok Build 的入口是 `grok`, 产品名称 `grokbuild` 不代表有同名命令. 首次用 `--version` / `--help` 核实身份并保存绝对入口路径和版本. 同一任务复用结果, 仅在入口, 版本或环境变化时重查; 同名 `agent` 也可能属于其他产品.
 
 ```powershell
 Get-Command grok, grokbuild, agent -All -ErrorAction SilentlyContinue
@@ -63,7 +63,9 @@ $cliExitCode = $LASTEXITCODE
 
 失败可输出 `{ "type": "error", "message": "..." }` 并非零退出, 也可能没有合法 JSON. 断流缺少终结事件为结果不确定; 持续读取原进程的 stdout / stderr 至结束.
 
-`--max-turns` 上限实测导致非零退出, `stopReason: "cancelled"` 与 stderr `max turns reached`, 属于限制终止. 权限拒绝却可零退出并 `end_turn`, 表示拒绝报告正常结束. `max_tokens` 等截断也不表示任务完成, 修改结果以实际 diff 和独立验证为准.
+优先等待进程结束及终结结果. 需要进度时使用 `streaming-json`, 按已消费行数或字节位置读取新增完整事件, 保留 error 事件并等待 `type: "end"`; 不反复解析整个日志或轮询尚未写出的单个 JSON 结果. 日志截断或替换后重新定位. 只有异常或接管需要时检查进程树.
+
+`--max-turns` 上限实测导致非零退出, `stopReason: "cancelled"` 与 stderr `max turns reached`, 属于限制终止. 权限拒绝却可零退出并 `end_turn`, 表示拒绝报告正常结束. `max_tokens` 等截断也不表示任务完成. 修改任务以实际 diff 和验证证据验收, 仅补查缺口, 不默认重跑已充分验证的检查.
 
 取消或超时不回滚文件, 不保证保存全部上下文. 恢复前检查进程和工作区, 在新 prompt 重述关键要求. 失联时终止本次拥有的进程树, 保留输出与 ID; 不重复可能已经发生的外部操作.
 
