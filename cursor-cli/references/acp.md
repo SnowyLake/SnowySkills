@@ -9,7 +9,7 @@
 
 ## 入口与传输
 
-以已核实的 Cursor Agent 入口运行 `acp`, 参数以当前 `acp --help` 为准, `--trust` 仅用于已获准信任的目录.
+使用已核实的 `cursor-agent` 入口运行 `cursor-agent acp`, 参数以当前 `cursor-agent acp --help` 为准, `--trust` 仅用于已获准信任的目录.
 
 stdin / stdout 是 UTF-8 换行分隔的 JSON-RPC 2.0, stderr 分开记录. 保持 stdin 打开并持续消费 stdout; request 使用唯一 ID 关联 response, notification 不带 ID. `session/update` 与服务端 request 可穿插在 response 之间. 一轮结束依据是对应 `session/prompt` 的 response / `stopReason`, 更新流只表示进度.
 

@@ -15,13 +15,13 @@ description: 调用 Cursor Agent CLI 执行代码任务, 续接会话或通过 A
 
 ## 识别与认证
 
-首次查找 `cursor-agent` 与 `agent`, 用 `--version` / `--help` 核实身份后保存绝对入口路径和版本. 同一任务复用结果, 仅在入口, 版本或环境变化时重查. `cursor` 通常启动编辑器, 同名 `agent` 可能属于其他产品.
+入口命令固定为 `cursor-agent`, 不回退到 `agent` 或 `cursor`. 首次用 `--version` / `--help` 核实身份后保存绝对入口路径和版本. 同一任务复用结果, 仅在入口, 版本或环境变化时重查.
 
 ```powershell
-Get-Command cursor-agent, agent -All -ErrorAction SilentlyContinue
+Get-Command cursor-agent -All -ErrorAction Stop
 ```
 
-POSIX 使用 `command -v`. Windows 优先已核实的 `.ps1` 或原生入口; `.cmd` 可能二次解析参数, 参数数组也不能消除包装层风险, 避免通过 `cmd /c` 传复杂 prompt. 缺失时按官方安装说明处理.
+POSIX 使用 `command -v cursor-agent`. Windows 优先已核实的 `.ps1` 或原生入口; `.cmd` 可能二次解析参数, 参数数组也不能消除包装层风险, 避免通过 `cmd /c` 传复杂 prompt. 缺失时按官方安装说明处理.
 
 `status` 检查认证, `login` 完成登录, 也可使用已有 `CURSOR_API_KEY`; 密钥不进入 prompt 或日志. `models` / `--list-models` 列出可选模型, 按任务需要设置 `--model`.
 

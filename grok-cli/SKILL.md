@@ -1,6 +1,6 @@
 ---
 name: grok-cli
-description: 调用 Grok Build CLI 执行代码任务, 续接会话或通过 ACP 追加运行中要求. 用于 grokbuild 或 grok CLI 调用.
+description: 通过 grok 命令调用 Grok Build CLI 执行代码任务, 续接会话或通过 ACP 追加运行中要求.
 ---
 
 # grok-cli
@@ -15,10 +15,10 @@ description: 调用 Grok Build CLI 执行代码任务, 续接会话或通过 ACP
 
 ## 识别与认证
 
-Grok Build 的入口是 `grok`, 产品名称 `grokbuild` 不代表有同名命令. 首次用 `--version` / `--help` 核实身份并保存绝对入口路径和版本. 同一任务复用结果, 仅在入口, 版本或环境变化时重查; 同名 `agent` 也可能属于其他产品.
+入口命令固定为 `grok`, 不回退到 `grokbuild` 或 `agent`. 首次用 `--version` / `--help` 核实身份并保存绝对入口路径和版本. 同一任务复用结果, 仅在入口, 版本或环境变化时重查.
 
 ```powershell
-Get-Command grok, grokbuild, agent -All -ErrorAction SilentlyContinue
+Get-Command grok -All -ErrorAction Stop
 ```
 
 POSIX 使用 `command -v grok`. Windows 优先原生入口或已核实的 `.ps1`, `.cmd` 会有二次解析风险, 避免通过 `cmd /c` 传复杂 prompt. 缺失时按官方安装说明处理.
