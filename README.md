@@ -9,6 +9,7 @@ Language: English | [中文](README.zh-CN.md)
   - [checkpoint](#checkpoint)
   - [cursor-cli](#cursor-cli)
   - [grok-cli](#grok-cli)
+  - [hybrid-work](#hybrid-work)
   - [unity-shader-analysis](#unity-shader-analysis)
   - [snapdragon-profiler-statistics](#snapdragon-profiler-statistics)
 - [Add Skills](#add-skills)
@@ -37,6 +38,11 @@ Use Cursor's agent CLI for non-interactive coding tasks, structured output, and 
 ### [grok-cli](grok-cli/SKILL.md)
 
 Use the Grok Build CLI (`grok`) for non-interactive coding tasks, structured output, and session continuation.
+
+### [hybrid-work](hybrid-work/SKILL.md)
+
+- Description: Keep decisions and acceptance with the primary agent while dynamically delegating bounded implementation, debugging, and validation to GPT-6 Sol with `xhigh` reasoning, without a persistent worker configuration.
+- Requirements: Codex only, with `spawn_agent`, explicit model selection, and `fork_turns: "none"`. Invoke `$hybrid-work` once to enable it for the conversation until you explicitly pause it; later tasks need no repeat invocation. The primary agent handles the work if the required capability is unavailable.
 
 ### [unity-shader-analysis](unity-shader-analysis/SKILL.md)
 
@@ -89,6 +95,7 @@ SnowyAgentSkills/
 |-- checkpoint-review/
 |-- cursor-cli/
 |-- grok-cli/
+|-- hybrid-work/
 |-- unity-shader-analysis/
 |-- snapdragon-profiler-statistics/
 |-- README.md
