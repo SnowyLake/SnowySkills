@@ -41,7 +41,7 @@ SnowyAgentSkills 是一个可复用 agent skills 集合仓库.
 
 ### [hybrid-work](hybrid-work/SKILL.md)
 
-- 简介: 主代理负责决策与验收, 动态创建使用 `gpt-6-sol` 和 `xhigh` 推理强度的子代理, 完成有界的实现, 调试与验证, 无需持久化执行子代理配置.
+- 简介: 主代理负责决策与验收, 动态创建使用 `gpt-6.1-sol` 和 `xhigh` 推理强度的子代理, 完成有界的实现, 调试与验证, 无需持久化执行子代理配置.
 - 运行前提: 仅适用于 Codex, 需要 `spawn_agent` 支持显式指定模型及 `fork_turns: "none"`. 调用一次 `$hybrid-work` 后在当前会话持续启用, 直到用户明确暂停, 后续任务无需再次调用; 所需能力不可用时由主代理接管.
 
 ### [unity-shader-analysis](unity-shader-analysis/SKILL.md)

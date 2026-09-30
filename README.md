@@ -41,7 +41,7 @@ Use the Grok Build CLI (`grok`) for non-interactive coding tasks, structured out
 
 ### [hybrid-work](hybrid-work/SKILL.md)
 
-- Description: Keep decisions and acceptance with the primary agent while dynamically delegating bounded implementation, debugging, and validation to GPT-6 Sol with `xhigh` reasoning, without a persistent worker configuration.
+- Description: Keep decisions and acceptance with the primary agent while dynamically delegating bounded implementation, debugging, and validation to GPT-6.1 Sol with `xhigh` reasoning, without a persistent worker configuration.
 - Requirements: Codex only, with `spawn_agent`, explicit model selection, and `fork_turns: "none"`. Invoke `$hybrid-work` once to enable it for the conversation until you explicitly pause it; later tasks need no repeat invocation. The primary agent handles the work if the required capability is unavailable.
 
 ### [unity-shader-analysis](unity-shader-analysis/SKILL.md)

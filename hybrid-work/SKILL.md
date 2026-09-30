@@ -23,7 +23,7 @@ description: 仅适用于 Codex. 用户明确启用 Hybrid 工作流后, 在当�
 
 ## 动态委派
 
-- 动态创建负责执行的 Worker, 默认模型为 `gpt-6-sol`, 推理强度为 `xhigh`; 用户指定值优先, 无需为其建立本地配置.
+- 动态创建负责执行的 Worker, 默认模型为 `gpt-6.1-sol`, 推理强度为 `xhigh`; 用户指定值优先, 无需为其建立本地配置.
 - 创建负责执行的 Worker 时设置 `agent_type: "default"`, 显式传入 `model` 和 `reasoning_effort`. 使用 `spawn_agent` 创建任何 Worker 时始终设置 `fork_turns: "none"`, 不复制全部或部分会话历史, 在任务消息中显式交接上下文.
 - Codex 未提供所需工具或参数时, 说明限制并由 Leader 执行, 保持会话启用状态; 不静默替换模型或改用历史继承.
 - 按交付物划分能独立开展的任务, 不设固定角色流水线. Leader 推进不重复的决策或验收准备; 没有独立工作时不为并行制造任务.
