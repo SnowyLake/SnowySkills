@@ -1,4 +1,0 @@
-interface:
-  display_name: "Checkpoint Status"
-  short_description: "Read checkpoint status without restoring context or modifying files"
-  default_prompt: "Use $checkpoint-status to list the current checkpoint status."

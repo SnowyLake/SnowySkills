@@ -1,34 +1,22 @@
 ---
 name: checkpoint-save
-description: Save or refresh session checkpoints by writing CONTEXT.md and HISTORY.md. Use when the user asks to save, update, refresh, checkpoint, persist, or record current session context for long-running, multi-session, handoff-based, or review-driven agent work.
+description: Save or refresh the current session's context and history for later continuation.
 ---
 
 # checkpoint-save
 
 ## 目录
 
-- [概览](#概览)
-- [执行前检查](#执行前检查)
+- [目标与边界](#目标与边界)
 - [会话文件夹解析](#会话文件夹解析)
-- [访问模式](#访问模式)
-- [工作流](#工作流)
-- [输出风格](#输出风格)
+- [保存](#保存)
+- [完成](#完成)
 
-## 概览
+## 目标与边界
 
-创建或刷新当前会话 checkpoint. 本 skill 只写当前会话文件夹中的 `CONTEXT.md` 和 `HISTORY.md`.
+保存足以继续工作的当前状态和必要历史. 本 skill 只写当前会话文件夹中的 `CONTEXT.md` 和 `HISTORY.md`; 不修改项目文件或其他产物, 除非用户另有明确要求.
 
-`checkpoint-save` 是 checkpoint family 的 root skill. 它保存其他 `checkpoint-*` skill 共用的 reference 文件.
-
-## 执行前检查
-
-写入, 校验, 总结或输出 checkpoint 数据前, 必须读取:
-
-- `references/file-contracts.md`
-- `references/common-rules.md`
-- `references/status-summary.md`
-
-如果任一 required reference 不可用, 停止执行并报告缺失文件. 不要凭记忆重建 checkpoint contract.
+保存前读取 [checkpoint-contract.md](references/checkpoint-contract.md) 中的共享规则和文件结构. 若文件不可用, 停止并报告缺失文件, 不凭记忆重建契约.
 
 ## 会话文件夹解析
 
@@ -38,35 +26,18 @@ description: Save or refresh session checkpoints by writing CONTEXT.md and HISTO
 - 明确没有: 当前对话没有可用会话文件夹线索, 且用户请求是在创建或刷新当前 checkpoint. 创建新的当前会话文件夹.
 - 不确定: 现有线索无法识别唯一当前会话文件夹, 或用户同时提到多个路径但没有标明角色. 询问用户指定已有文件夹或确认创建新文件夹.
 
-不要检查 `.agent-sessions/` 来猜测语义匹配的文件夹, 除非用户明确要求 discovery 或列出候选.
-
 创建新文件夹时, 使用 `.agent-sessions/{YYYYMMDD}-{short-kebab-case-session-summary}/`, 并在输出中说明新建路径.
 
-## 访问模式
+## 保存
 
-- 可以读取相关项目文件, 以及当前会话文件夹中已有的 checkpoint 文件.
-- 当前会话文件夹明确没有时, 可以创建当前会话文件夹.
-- 只能写入当前会话文件夹中的 `CONTEXT.md` 和 `HISTORY.md`.
-- 不得创建或修改其他产物, 除非用户明确要求额外文件.
+- 先读已有 `CONTEXT.md`, 结合当前对话和影响本次保存的项目事实确定变化. 对已有 `HISTORY.md`, 先查最近相关条目, 需要追溯时再扩大阅读, 不要求每次通读全部历史.
+- 优先保存后续 agent 无法从项目文件直接恢复, 或重新获取成本较高的信息: 用户目标和范围, 重要决策及理由, 未完成工作的准确位置, 已做验证及其范围, 未验证假设. 可从代码直接获取的细节保留必要说明和文件引用即可.
+- 将 `CONTEXT.md` 维护为干净的当前快照, 同步 `Work Artifacts`; 没有工作产物时该章节可以为空. 将仍有价值的过期过程记录, 已拒绝方案和被取代的决策依据移入历史.
+- 首次保存时建立两个文件. 后续仅在状态有实质变化或出现值得保留的新背景时, 向 `HISTORY.md` 追加一个新条目, 不合并进旧条目. 两个文件完整且没有实质变化时, 保持文件不变, 不追加重复历史.
+- 保留已有历史条目, 包括未读取的部分; 未经用户要求不清理或重建旧历史. 缺少文件时补齐可确认的内容并说明缺失, 不虚构已丢失的信息. 写入时遵守契约中的文件结构并同步 TOC.
 
-## 工作流
+## 完成
 
-1. 解析当前会话文件夹.
-2. 如果已有 `CONTEXT.md` 和 `HISTORY.md`, 读取它们.
-3. 对比 checkpoint 内容, 当前对话状态和当前项目文件.
-4. 将 `CONTEXT.md` 重写为干净的当前状态快照. 不要机械追加 history.
-5. 维护 `CONTEXT.md` 中的 `Work Artifacts`. 没有 work artifacts 时可以为空.
-6. 向 `HISTORY.md` 追加一个新条目. 不要把新 history 合并进旧条目.
-7. 保留有用的既有 history. 除非用户明确要求清理, 不要删除旧条目.
-8. 将过期过程记录, 已拒绝方案, 已被取代的假设和仍有用的决策依据从 `CONTEXT.md` 移入新的 `HISTORY.md` 条目.
-9. 同步每个文件的 `Table of Contents`.
+确认需要保存的状态和历史已写入, 文件结构及引用与本次变化一致. 若只完成部分写入, 如实说明, 不报告全部保存成功.
 
-`CONTEXT.md` 和 `HISTORY.md` 必须使用 `references/file-contracts.md` 中的结构.
-
-## 输出风格
-
-成功完成后输出:
-
-- 会话文件夹.
-- 已更新文件.
-- 当前会话 status summary. 格式见 `references/status-summary.md`.
+简要报告会话路径, 已更新文件, 关键变化和仍影响续接的未解决事项. 无实质变化时说明 checkpoint 已是最新. 默认不逐段复述快照; 用户要求完整状态时再展开.

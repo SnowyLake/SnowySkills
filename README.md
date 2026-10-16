@@ -25,9 +25,9 @@ Each skill lives under `<skill-name>/` at the repository root as a self-containe
 
 ### [checkpoint](checkpoint-save/README.md)
 
-- Description: Checkpoint skill family for saving, restoring, handing off, listing status, and reviewing session context in long-running, multi-session, handoff-based, or review-driven agent work.
+- Description: Checkpoint skill family for saving and restoring session context in long-running or multi-session agent work.
 
-- Skills: `checkpoint-save`, `checkpoint-restore`, `checkpoint-handoff`, `checkpoint-status`, `checkpoint-review`.
+- Skills: `checkpoint-save`, `checkpoint-restore`.
 
 - Agent scope: All agents.
 
@@ -90,9 +90,6 @@ SnowyAgentSkills/
 |   |-- agents/
 |   `-- references/
 |-- checkpoint-restore/
-|-- checkpoint-handoff/
-|-- checkpoint-status/
-|-- checkpoint-review/
 |-- cursor-cli/
 |-- grok-cli/
 |-- hybrid-work/

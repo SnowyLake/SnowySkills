@@ -1,4 +1,0 @@
-interface:
-  display_name: "Checkpoint Handoff"
-  short_description: "Handoff, migrate, branch, or take over checkpoint context into a target session folder"
-  default_prompt: "Use $checkpoint-handoff to take over context from a source session folder into the current session."

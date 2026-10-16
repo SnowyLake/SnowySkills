@@ -1,4 +1,0 @@
-interface:
-  display_name: "Checkpoint Review"
-  short_description: "Review the actual work referenced by checkpoint files and write REVIEW.md"
-  default_prompt: "Use $checkpoint-review to review a current or specified session folder's work."
