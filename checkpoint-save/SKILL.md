@@ -1,6 +1,6 @@
 ---
 name: checkpoint-save
-description: Save or refresh the current session's context and history for later continuation.
+description: Save or refresh the current session's context and history for later reading, continuation, or review.
 ---
 
 # checkpoint-save
@@ -14,11 +14,13 @@ description: Save or refresh the current session's context and history for later
 
 ## 目标与边界
 
-保存足以继续工作的当前状态和必要历史. 本 skill 只写当前会话文件夹中的 `CONTEXT.md` 和 `HISTORY.md`; 不修改项目文件或其他产物, 除非用户另有明确要求.
+保存供后续读取, 续接或审查的当前状态和必要历史. 本 skill 只写当前会话文件夹中的 `CONTEXT.md` 和 `HISTORY.md`; 不修改项目文件或其他产物, 除非用户另有明确要求.
 
 保存前读取 [checkpoint-contract.md](references/checkpoint-contract.md) 中的共享规则和文件结构. 若文件不可用, 停止并报告缺失文件, 不凭记忆重建契约.
 
 ## 会话文件夹解析
+
+读取其他会话的 checkpoint 不会将其来源文件夹设为当前会话文件夹. 仅作为读取来源的路径不作为保存位置的候选; 用户明确指定共享文件夹作为当前会话文件夹时, 才按该指定保存.
 
 将当前会话文件夹解析为三种状态:
 

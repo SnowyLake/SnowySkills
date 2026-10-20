@@ -1,4 +1,0 @@
-interface:
-  display_name: "Checkpoint Restore"
-  short_description: "Restore session context read-only from checkpoint files"
-  default_prompt: "Use $checkpoint-restore to restore context from the current checkpoint or a specified session folder."

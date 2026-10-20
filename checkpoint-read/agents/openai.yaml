@@ -1,0 +1,4 @@
+interface:
+  display_name: "Checkpoint Read"
+  short_description: "Read session checkpoints for continuation, review, or questions"
+  default_prompt: "Use $checkpoint-read to read the current checkpoint or a specified session folder and explain the relevant work context."

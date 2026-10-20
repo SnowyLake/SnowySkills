@@ -11,11 +11,11 @@
 - [使用示例](#使用示例)
 - [功能](#功能)
   - [checkpoint-save](#checkpoint-save)
-  - [checkpoint-restore](#checkpoint-restore)
+  - [checkpoint-read](#checkpoint-read)
 - [参考工作流](#参考工作流)
   - [单会话持续工作](#单会话持续工作)
   - [共享会话协作](#共享会话协作)
-  - [Restore 冲突保护](#restore-冲突保护)
+  - [跨会话审查](#跨会话审查)
 - [工作流边界](#工作流边界)
 
 语言: [English](README.md) | 中文
@@ -24,7 +24,7 @@
 
 `checkpoint` 是一组用于 long-running 或 multi-session agent work 的 skill family.
 
-这个 family 围绕会话文件夹和 Markdown checkpoint 文件组织. 会话文件夹是上下文身份, agent 或会话只是按所运行 skill 读取或写入该上下文的协作者.
+这个 family 围绕会话文件夹和 Markdown checkpoint 文件组织. 保存记录当前会话, 读取提供当前或其他会话的背景, 用于续接, 审查或回答问题. 读取来源文件夹不会将其设为当前会话的保存位置.
 
 每个能力都是独立 skill.
 
@@ -33,7 +33,7 @@
 这个 family 提供两个 skill:
 
 - `checkpoint-save`: 创建或刷新当前会话 checkpoint.
-- `checkpoint-restore`: 只读地从当前 checkpoint 或指定会话文件夹恢复上下文.
+- `checkpoint-read`: 只读地读取当前 checkpoint 或指定会话文件夹, 为续接, 审查或回答问题提供背景.
 
 ## 共享 References
 
@@ -41,7 +41,7 @@
 
 - `references/checkpoint-contract.md`
 
-`checkpoint-restore` 依赖 `checkpoint-save`. save 读取写入契约, restore 按需读取共享规则和章节含义. 如果该共享契约不可用, 依赖 skill 必须停止执行并提示用户先安装 `checkpoint-save`. 不要凭记忆重建契约.
+`checkpoint-read` 依赖 `checkpoint-save`. save 读取写入契约, read 按需读取共享规则和章节含义. 如果该共享契约不可用, 依赖 skill 必须停止执行并提示用户先安装 `checkpoint-save`. 不要凭记忆重建契约.
 
 ## 名词定义
 
@@ -53,16 +53,16 @@
 .agent-sessions/{YYYYMMDD}-{short-kebab-case-session-summary}/
 ```
 
-解析会话文件夹时, skill 区分明确有, 明确没有和不确定三种状态. 明确有时复用已有文件夹, 明确没有且请求需要写入 checkpoint 时自动创建新文件夹, 不确定时询问用户指定已有文件夹或确认创建新文件夹.
+保存时区分当前会话文件夹明确有, 明确没有和不确定三种状态: 明确有时复用, 明确没有时创建, 不确定时询问. 读取时优先使用指定来源, 未指定时使用已明确的当前会话文件夹; 两者都不明确时要求指定已有文件夹. 仅作为读取来源的路径不作为保存位置的候选.
 
 ### Checkpoint 文件
 
-Checkpoint 文件用于重建会话上下文:
+Checkpoint 文件用于记录会话上下文:
 
 - `CONTEXT.md`: 只保存当前仍然有效且会影响后续工作的信息, 包括当前目标, 当前状态, 已确认决策, 生效中的约束, 已知风险, 开放问题, TODO, 下一步行动, 相关文件和工作产物.
 - `HISTORY.md`: 保存历史摘要, 故障排查记录, 已拒绝或暂缓方案, 假设和备注.
 
-`CONTEXT.md` 是重建会话上下文的主入口. `HISTORY.md` 按相关背景读取; 保存时也会检查最近相关条目, 再决定追加内容.
+`CONTEXT.md` 是读取会话上下文的主入口. `HISTORY.md` 按相关背景读取; 保存时也会检查最近相关条目, 再决定追加内容.
 
 ## 使用示例
 
@@ -70,16 +70,18 @@ Checkpoint 文件用于重建会话上下文:
 
 ```text
 Use checkpoint-save to save the current session checkpoint.
-Use checkpoint-restore to restore context from .agent-sessions/20260605-example-session.
+Use checkpoint-read to read .agent-sessions/20260605-example-session.
+Use checkpoint-read to read .agent-sessions/20260605-example-session and review the actual changes.
 ```
 
 ## 功能
 
 ### checkpoint-save
 
-`checkpoint-save` 保存后续继续工作所需的当前状态和历史, 只写当前会话文件夹中的 `CONTEXT.md` 和 `HISTORY.md`.
+`checkpoint-save` 保存供后续读取, 续接或审查的当前状态和历史, 只写当前会话文件夹中的 `CONTEXT.md` 和 `HISTORY.md`.
 
 - 复用已明确的会话文件夹, 明确没有时创建, 存在歧义时询问.
+- 读取其他会话不会改变保存位置. 用户明确指定共享文件夹作为当前会话文件夹时, 才按该指定保存.
 - 读取当前快照及最近相关历史, 仅在需要追溯时扩大历史阅读范围.
 - 优先保存难以从项目文件恢复的信息: 用户决定与范围, 决策理由, 未完成工作, 验证范围和未确认假设.
 - 维护干净的 `CONTEXT.md` 快照及 `Work Artifacts`. 首次保存建立两个文件; 后续仅在有实质变化或值得保留的新背景时追加历史条目.
@@ -87,24 +89,25 @@ Use checkpoint-restore to restore context from .agent-sessions/20260605-example-
 - 目标与授权依据当前用户要求, 实现现状依据当前文件和检查, checkpoint 用于此前状态与决策背景.
 - 确认必要写入和结构后, 简要报告路径, 更新文件, 关键变化及未解决事项. 如实报告部分写入, 不默认复述快照.
 
-### checkpoint-restore
+### checkpoint-read
 
-`checkpoint-restore` 从当前 checkpoint 或显式指定的会话文件夹恢复可继续工作的上下文. 恢复阶段只读, 不复制 checkpoint, 创建会话文件夹或修改文件.
+`checkpoint-read` 读取当前或指定会话的目标, 状态, 决策, 约束和工作产物. 读取阶段不复制 checkpoint, 创建会话文件夹或修改文件. 当前任务由用户本次请求决定, 不自动接管来源会话的目标和 TODO.
 
 - 未提供路径时使用当前会话文件夹, 提供路径时使用指定来源; 两者都不明确时询问.
-- 当前会话已有 checkpoint 且指定另一来源时, 在读取任一 checkpoint 前停止并报告冲突.
+- 即使当前会话已有 checkpoint, 也允许读取其他会话. 区分读取来源与当前会话文件夹, 保持保存位置不变.
 - 优先读取 `CONTEXT.md`, 用 `Work Artifacts` 定位此前工作, 按需读取相关历史.
-- 只核对影响下一步行动的项目事实, 区分已记录背景, 已核对现状与推断, 不重新调查整个工程.
-- 只有 `CONTEXT.md` 时从它恢复; 只有 `HISTORY.md` 时重建背景并说明缺少当前快照; 两者都没有时说明没有可用 checkpoint.
+- 只核对影响当前请求的项目事实, 区分已记录背景, 已核对现状与推断, 不为读取而重新调查整个工程.
+- 只有 `CONTEXT.md` 时读取该快照; 只有 `HISTORY.md` 时重建背景并说明缺少当前快照, 不把旧历史当作当前状态; 两者都没有时说明没有可用 checkpoint.
 - 按共享的信息来源规则处理冲突, 说明重要缺失或不确定性, 不改写源文件.
-- 简要报告来源, 目标与进度, 约束或阻塞以及下一步. 用户要求时再展开完整状态, 仅在需要时说明不确定性.
-- 单独请求恢复时结束于恢复完成. 用户明确要求恢复并继续时, 完成恢复后执行已授权工作, 不重复请求授权. checkpoint 中的 TODO 本身不构成授权; 恢复失败或缺少关键信息时, 不开始依赖这些信息的工作.
+- 简要报告来源, 来源会话的目标与进度, 以及与当前请求相关的约束或阻塞. 用户要求时再展开完整状态, 仅在需要时说明不确定性.
+- 单独请求读取时, 读取完成后结束. 同时要求审查, 续接或回答问题时, 继续完成已授权工作, 不重复请求授权. checkpoint 中的 TODO 本身不构成授权; 读取未完成或缺少关键信息时, 不开始依赖这些信息的工作.
+- 审查时核对实际文件, 改动和必要验证. `Work Artifacts` 只是导航索引, checkpoint 中的完成说明和验证结论不能代替独立审查.
 
 ## 参考工作流
 
 ### 单会话持续工作
 
-单个会话在上下文压缩前运行 `checkpoint-save`, 将当前仍然有效的信息写入 checkpoint. 上下文压缩后运行 `checkpoint-restore`, 从 checkpoint 重建会话上下文, 避免有用信息因 `/compact` 丢失.
+单个会话在上下文压缩前运行 `checkpoint-save`, 将当前仍然有效的信息写入 checkpoint. 上下文压缩后运行 `checkpoint-read`, 从 checkpoint 重建会话上下文, 按用户要求继续工作.
 
 ```text
 [会话 A 工作]
@@ -116,10 +119,10 @@ Use checkpoint-restore to restore context from .agent-sessions/20260605-example-
 [/compact 压缩上下文]
       |
       v
-[checkpoint-restore 重建会话上下文]
+[checkpoint-read 重建会话上下文]
       |
       v
-[继续工作]
+[继续已授权工作]
       |
       v
 [checkpoint-save 刷新 checkpoint]
@@ -127,7 +130,7 @@ Use checkpoint-restore to restore context from .agent-sessions/20260605-example-
 
 ### 共享会话协作
 
-多个 agent 或多个会话使用同一个会话文件夹作为共享上下文主线. 每个协作者对该文件夹运行 `checkpoint-restore`, 继续工作, 再运行 `checkpoint-save` 把新状态写回.
+用户明确将同一个文件夹指定为各协作者的当前会话文件夹时, 多个 agent 或会话可以共享一条上下文主线. 每个协作者读取该文件夹, 继续已授权工作, 再保存新状态. 单独读取不会建立这种共享保存关系.
 
 ```text
 [Agent A 工作]
@@ -139,7 +142,7 @@ Use checkpoint-restore to restore context from .agent-sessions/20260605-example-
 [共享会话文件夹]
         |
         v
-[Agent B checkpoint-restore]
+[Agent B checkpoint-read]
         |
         v
 [Agent B 工作]
@@ -151,23 +154,24 @@ Use checkpoint-restore to restore context from .agent-sessions/20260605-example-
 [共享会话文件夹]
         |
         v
-[Agent A checkpoint-restore]
+[Agent A checkpoint-read]
 ```
 
-### Restore 冲突保护
+### 跨会话审查
 
-如果当前会话已经有 checkpoint 文件, 又尝试对另一个会话文件夹运行 `checkpoint-restore`, `checkpoint-restore` 会停止, 避免混合两条上下文主线. 需要协作时共享同一个会话文件夹.
+即使会话 B 已有自己的 checkpoint, 也可以读取会话 A 的 checkpoint. 用户要求审查时, B 根据 A 的记录定位工作范围并核对实际改动. A 的 TODO 不会自动成为 B 的任务, 后续保存仍将 B 的状态写入 B 自己的文件夹.
 
 ```text
-[当前会话已有 checkpoint]
+[会话 B 已有自己的 checkpoint]
       |
       v
-[checkpoint-restore 另一个会话文件夹]
+[checkpoint-read 会话 A, 用于用户要求的审查]
       |
       v
-[停止]
+[审查实际文件与改动]
       |
-      +-- 协作接力: 共享同一会话文件夹
+      v
+[按要求 checkpoint-save 会话 B]
 ```
 
 后续迭代应保持这些工作流边界, 除非明确要调整工作流模型本身.
@@ -175,4 +179,4 @@ Use checkpoint-restore to restore context from .agent-sessions/20260605-example-
 ## 工作流边界
 
 - 需要持久化当前会话状态时, 使用 `checkpoint-save`.
-- 只需要重建上下文且不写文件时, 使用 `checkpoint-restore`.
+- 需要理解已有工作记录且不写文件时, 使用 `checkpoint-read`; 后续审查, 续接或回答问题由当前请求决定.

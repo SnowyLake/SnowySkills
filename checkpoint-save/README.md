@@ -11,11 +11,11 @@
 - [Usage Examples](#usage-examples)
 - [Capabilities](#capabilities)
   - [checkpoint-save](#checkpoint-save)
-  - [checkpoint-restore](#checkpoint-restore)
+  - [checkpoint-read](#checkpoint-read)
 - [Reference Workflows](#reference-workflows)
   - [Single Session](#single-session)
   - [Shared Session Collaboration](#shared-session-collaboration)
-  - [Restore Conflict Guard](#restore-conflict-guard)
+  - [Cross-Session Review](#cross-session-review)
 - [Workflow Boundaries](#workflow-boundaries)
 
 Language: English | [中文](README.zh-CN.md)
@@ -24,7 +24,7 @@ Language: English | [中文](README.zh-CN.md)
 
 `checkpoint` is a skill family for long-running or multi-session agent work.
 
-The family is organized around session folders and Markdown checkpoint files. A session folder is the context identity, while agents or conversations are interchangeable collaborators that read from or write to that context according to the skill they run.
+The family is organized around session folders and Markdown checkpoint files. Saving records the current session; reading provides background from the current or another session for continuation, review, or questions. Reading a source folder does not make it the current session's save destination.
 
 Each capability is a standalone skill.
 
@@ -33,7 +33,7 @@ Each capability is a standalone skill.
 This family provides two skills:
 
 - `checkpoint-save`: Create or refresh the current session checkpoint.
-- `checkpoint-restore`: Restore context from the current checkpoint or a specified session folder in read-only mode.
+- `checkpoint-read`: Read the current checkpoint or a specified session folder for continuation, review, or questions without modifying files.
 
 ## Shared References
 
@@ -41,7 +41,7 @@ This family provides two skills:
 
 - `references/checkpoint-contract.md`
 
-`checkpoint-restore` depends on `checkpoint-save`. Save reads the writing contract; restore reads shared rules and section meanings as needed. If this shared contract is unavailable, the dependent skill stops and asks the user to install `checkpoint-save` first. It must not rebuild the contract from memory.
+`checkpoint-read` depends on `checkpoint-save`. Save reads the writing contract; read uses shared rules and section meanings as needed. If this shared contract is unavailable, the dependent skill stops and asks the user to install `checkpoint-save` first. It must not rebuild the contract from memory.
 
 ## Terminology
 
@@ -53,16 +53,16 @@ A session folder is the directory that stores one context line:
 .agent-sessions/{YYYYMMDD}-{short-kebab-case-session-summary}/
 ```
 
-When resolving a session folder, the skills distinguish identified, absent, and ambiguous states. They reuse an identified folder, create a new folder when no usable folder signal exists and the request needs to write a checkpoint, and ask the user when the target is ambiguous.
+Saving distinguishes an identified, absent, or ambiguous current session folder. It reuses an identified folder, creates one when absent, and asks when ambiguous. Reading uses the specified source or defaults to the identified current session folder; if neither is clear, it asks for an existing folder. A path used only as a reading source is not a save destination candidate.
 
 ### Checkpoint Files
 
-Checkpoint files rebuild session context:
+Checkpoint files record session context:
 
 - `CONTEXT.md`: Stores only current, still-valid information that affects future work, including the current goal, current state, confirmed decisions, active constraints, known risks, open questions, TODO, next actions, relevant files, and work artifacts.
 - `HISTORY.md`: Stores historical summaries, troubleshooting records, rejected or deferred approaches, assumptions, and notes.
 
-`CONTEXT.md` is the primary restore entry point. `HISTORY.md` is consulted for relevant background; saving also checks recent relevant entries before deciding what to append.
+`CONTEXT.md` is the primary reading entry point. `HISTORY.md` is consulted for relevant background; saving also checks recent relevant entries before deciding what to append.
 
 ## Usage Examples
 
@@ -70,16 +70,18 @@ Use the standalone skill that matches the requested capability:
 
 ```text
 Use checkpoint-save to save the current session checkpoint.
-Use checkpoint-restore to restore context from .agent-sessions/20260605-example-session.
+Use checkpoint-read to read .agent-sessions/20260605-example-session.
+Use checkpoint-read to read .agent-sessions/20260605-example-session and review the actual changes.
 ```
 
 ## Capabilities
 
 ### checkpoint-save
 
-`checkpoint-save` saves the current state and history needed to continue later. It writes only `CONTEXT.md` and `HISTORY.md` in the current session folder.
+`checkpoint-save` saves the current state and history for later reading, continuation, or review. It writes only `CONTEXT.md` and `HISTORY.md` in the current session folder.
 
 - Reuses the identified session folder, creates one when absent, and asks when the folder is ambiguous.
+- Reading another session does not change the save destination. A shared folder becomes the current session folder only when the user explicitly designates it as such.
 - Reads the current snapshot and recent relevant history, expanding historical reading only when needed.
 - Preserves information that is costly or impossible to recover from project files: user decisions and scope, reasons, unfinished work, validation coverage, and unresolved assumptions.
 - Maintains a clean `CONTEXT.md` snapshot and its `Work Artifacts`. Creates both files on the first save; later appends a history entry only for substantive changes or useful new background.
@@ -87,24 +89,25 @@ Use checkpoint-restore to restore context from .agent-sessions/20260605-example-
 - Uses current user instructions for goals and authorization, current files and checks for implementation facts, and checkpoints for prior state and decision context.
 - Confirms the required writes and structure, then briefly reports the session path, updated files, key changes, and unresolved matters. Reports partial writes honestly. Does not repeat the snapshot unless requested.
 
-### checkpoint-restore
+### checkpoint-read
 
-`checkpoint-restore` rebuilds usable context from the current checkpoint or an explicitly specified session folder. The restore phase is read-only: it does not copy checkpoints, create session folders, or modify files.
+`checkpoint-read` reads the goals, state, decisions, constraints, and work artifacts of the current or a specified session. The reading phase does not copy checkpoints, create session folders, or modify files. The current request determines the task; source goals and TODOs are not automatically adopted.
 
 - Uses the current session folder when no path is provided, or the specified folder otherwise. Asks for a path if neither is clear.
-- Stops before reading either checkpoint if the current session already has checkpoint files and the user specifies a different folder.
+- Allows reading another session even when the current session already has a checkpoint. Keeps the source folder separate from the current session folder and leaves the save destination unchanged.
 - Reads `CONTEXT.md` first, uses `Work Artifacts` to locate prior work, and consults relevant history only when needed.
-- Checks only project facts that affect the next action. Distinguishes recorded context, verified current facts, and inference instead of re-investigating the entire project.
-- Restores from `CONTEXT.md` alone when available. If only `HISTORY.md` exists, reconstructs background and reports the missing current snapshot. If neither exists, reports that no checkpoint is available.
+- Checks only project facts that affect the current request. Distinguishes recorded context, verified current facts, and inference instead of re-investigating the entire project just to read a checkpoint.
+- Reads `CONTEXT.md` alone when available. If only `HISTORY.md` exists, reconstructs background and reports the missing current snapshot without treating old history as current state. If neither exists, reports that no checkpoint is available.
 - Uses the shared information-source rules to handle conflicts. Reports material gaps or uncertainty without modifying the source files.
-- Briefly reports the source, goal and progress, constraints or blockers, and next action. Expands the status only when requested; explains uncertainty only when relevant.
-- Ends after a standalone restore request. When the user explicitly requests restore and continuation together, completes restore and proceeds with the authorized work without asking again. Checkpoint TODOs alone do not authorize execution; work that depends on failed restoration or missing critical information does not start.
+- Briefly reports the source, its goal and progress, and constraints or blockers relevant to the current request. Expands the status only when requested; explains uncertainty only when relevant.
+- Ends after a standalone read request. When the user also requests review, continuation, or answers, proceeds with that authorized work without asking again. Checkpoint TODOs alone do not authorize execution; work that depends on incomplete reading or missing critical information does not start.
+- For review, checks actual files, changes, and necessary validation. `Work Artifacts` is only a navigation index; checkpoint completion claims and validation reports do not replace independent review.
 
 ## Reference Workflows
 
 ### Single Session
 
-One session runs `checkpoint-save` before context compaction, writing still-valid information into the checkpoint. After `/compact`, it runs `checkpoint-restore` to rebuild session context from the checkpoint and avoid losing useful information.
+One session runs `checkpoint-save` before context compaction, writing still-valid information into the checkpoint. After `/compact`, it runs `checkpoint-read` to rebuild session context from the checkpoint and continues when requested.
 
 ```text
 [Session A work]
@@ -116,10 +119,10 @@ One session runs `checkpoint-save` before context compaction, writing still-vali
 [/compact compresses context]
       |
       v
-[checkpoint-restore rebuilds session context]
+[checkpoint-read rebuilds session context]
       |
       v
-[continue work]
+[continue authorized work]
       |
       v
 [checkpoint-save refreshes checkpoint]
@@ -127,7 +130,7 @@ One session runs `checkpoint-save` before context compaction, writing still-vali
 
 ### Shared Session Collaboration
 
-Multiple agents or conversations use the same session folder as one shared context line. Each collaborator runs `checkpoint-restore` on that folder, continues the work, then runs `checkpoint-save` to write the new state back.
+When the user explicitly designates the same folder as each collaborator's current session folder, multiple agents or conversations can share one context line. Each collaborator reads that folder, continues the authorized work, then saves the new state there. Reading alone does not establish this shared save destination.
 
 ```text
 [Agent A work]
@@ -139,7 +142,7 @@ Multiple agents or conversations use the same session folder as one shared conte
 [Shared session folder]
         |
         v
-[Agent B checkpoint-restore]
+[Agent B checkpoint-read]
         |
         v
 [Agent B work]
@@ -151,23 +154,24 @@ Multiple agents or conversations use the same session folder as one shared conte
 [Shared session folder]
         |
         v
-[Agent A checkpoint-restore]
+[Agent A checkpoint-read]
 ```
 
-### Restore Conflict Guard
+### Cross-Session Review
 
-If the current conversation already has checkpoint files and the user tries to run `checkpoint-restore` on a different session folder, `checkpoint-restore` stops instead of mixing two context lines. Use the same shared session folder for collaboration.
+Session B may read session A's checkpoint even when B already has its own checkpoint. If the user requests a review, B uses A's record to locate the work and checks the actual changes. A's TODOs do not become B's task, and a later save still records B in B's own folder.
 
 ```text
-[Current session already has checkpoint]
+[Session B already has its own checkpoint]
       |
       v
-[checkpoint-restore another session folder]
+[checkpoint-read session A for requested review]
       |
       v
-[stop]
+[review actual files and changes]
       |
-      +-- collaborate: share the same session folder
+      v
+[checkpoint-save session B when requested]
 ```
 
 Future changes to this skill family should preserve these workflow boundaries unless the workflow model is intentionally revised.
@@ -175,4 +179,4 @@ Future changes to this skill family should preserve these workflow boundaries un
 ## Workflow Boundaries
 
 - Use `checkpoint-save` when the current session state should be persisted.
-- Use `checkpoint-restore` when context should be rebuilt without writing files.
+- Use `checkpoint-read` to understand recorded work without writing files; the current request determines any subsequent review, continuation, or answers.

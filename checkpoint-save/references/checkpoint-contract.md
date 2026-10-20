@@ -9,7 +9,7 @@
   - [Work Artifacts](#work-artifacts)
 - [HISTORY.md](#historymd)
 
-本文件定义两个 skill 共用的信息判断规则和 checkpoint 文件结构. save 使用完整写入契约; restore 使用共享规则及所需的文件含义, 无需把写入模板作为读取已有 checkpoint 的前置条件. 各自的访问范围与完成条件见对应 `SKILL.md`.
+本文件定义两个 skill 共用的信息判断规则和 checkpoint 文件结构. `checkpoint-save` 使用完整写入契约; `checkpoint-read` 使用共享规则及所需的文件含义, 无需把写入模板作为读取已有 checkpoint 的前置条件. 各自的访问范围与完成条件见对应 `SKILL.md`.
 
 ## 共享规则
 

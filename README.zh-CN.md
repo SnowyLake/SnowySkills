@@ -25,9 +25,9 @@ SnowyAgentSkills 是一个可复用 agent skills 集合仓库.
 
 ### [checkpoint](checkpoint-save/README.zh-CN.md)
 
-- 简介: checkpoint skill family, 用于在 long-running 或 multi-session agent work 中保存和恢复会话上下文.
+- 简介: checkpoint skill family, 用于在长期或多会话工作中保存和读取会话上下文, 为续接, 审查或回答问题提供背景.
 
-- Skills: `checkpoint-save`, `checkpoint-restore`.
+- Skills: `checkpoint-save`, `checkpoint-read`.
 
 - 适用范围: All agents.
 
@@ -89,7 +89,7 @@ SnowyAgentSkills/
 |   |-- SKILL.md
 |   |-- agents/
 |   `-- references/
-|-- checkpoint-restore/
+|-- checkpoint-read/
 |-- cursor-cli/
 |-- grok-cli/
 |-- hybrid-work/
