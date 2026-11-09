@@ -6,6 +6,7 @@
 
 - [概览](#概览)
 - [可用 Skills](#可用-skills)
+  - [snowy-review](#snowy-review)
   - [checkpoint](#checkpoint)
   - [cursor-cli](#cursor-cli)
   - [grok-cli](#grok-cli)
@@ -22,6 +23,10 @@ SnowyAgentSkills 是一个可复用 agent skills 集合仓库.
 每个 skill 都位于仓库根目录的 `<skill-name>/` 下, 并作为自包含目录独立维护. 仓库目标是保持 agent-neutral, 让不同 agent runtime 都能按自己的加载模型采用合适的 skill 内容.
 
 ## 可用 Skills
+
+### [snowy-review](snowy-review/SKILL.md)
+
+审阅当前任务累计改动或指定文件、模块、系统乃至整个项目, 同等重视逻辑正确性、性能与资源开销, 以及无用、冗余、过度复杂实现. 按需使用其他相关 skill, 保持用户指定的范围与操作授权.
 
 ### [checkpoint](checkpoint-save/README.zh-CN.md)
 
@@ -89,6 +94,7 @@ SnowyAgentSkills/
 |   |-- SKILL.md
 |   |-- agents/
 |   `-- references/
+|-- snowy-review/
 |-- checkpoint-read/
 |-- cursor-cli/
 |-- grok-cli/

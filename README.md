@@ -6,6 +6,7 @@ Language: English | [中文](README.zh-CN.md)
 
 - [Overview](#overview)
 - [Available Skills](#available-skills)
+  - [snowy-review](#snowy-review)
   - [checkpoint](#checkpoint)
   - [cursor-cli](#cursor-cli)
   - [grok-cli](#grok-cli)
@@ -22,6 +23,10 @@ SnowyAgentSkills is a collection repository for reusable agent skills.
 Each skill lives under `<skill-name>/` at the repository root as a self-contained folder. The repository is intended to stay agent-neutral so different agent runtimes can adopt the skill content that fits their own loading model.
 
 ## Available Skills
+
+### [snowy-review](snowy-review/SKILL.md)
+
+Review cumulative changes for the current task or a specified file, module, system, or whole project. Give equal attention to correctness, performance and resource costs, and unnecessary, redundant, or overly complex code; use other relevant skills when helpful without changing the requested scope or authorization.
 
 ### [checkpoint](checkpoint-save/README.md)
 
@@ -89,6 +94,7 @@ SnowyAgentSkills/
 |   |-- SKILL.md
 |   |-- agents/
 |   `-- references/
+|-- snowy-review/
 |-- checkpoint-read/
 |-- cursor-cli/
 |-- grok-cli/
