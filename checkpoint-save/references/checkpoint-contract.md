@@ -4,12 +4,14 @@
 
 - [共享规则](#共享规则)
 - [语言和格式](#语言和格式)
-- [TOC 规则](#toc-规则)
+- [信息取舍与更新](#信息取舍与更新)
 - [CONTEXT.md](#contextmd)
-  - [Work Artifacts](#work-artifacts)
 - [HISTORY.md](#historymd)
+- [旧格式兼容](#旧格式兼容)
 
 本文件定义两个 skill 共用的信息判断规则和 checkpoint 文件结构. `checkpoint-save` 使用完整写入契约; `checkpoint-read` 使用共享规则及所需的文件含义, 无需把写入模板作为读取已有 checkpoint 的前置条件. 各自的访问范围与完成条件见对应 `SKILL.md`.
+
+当前快照采用 [OpenCode v2.3.0 的会话压缩结构与更新原则](https://github.com/anomalyco/opencode/blob/v2.3.0/packages/core/src/session/compaction.ts#L173-L254), 补充文件保存, 验证范围和跨会话定位要求. 不采用其内部摘要阶段禁止工具调用或假定环境信息会重新提供的运行前提.
 
 ## 共享规则
 
@@ -17,7 +19,7 @@
 - 当会话文件夹不明确时, 不要检查 `.agent-sessions/` 来猜测语义匹配的文件夹, 除非用户明确要求 discovery 或列出候选.
 - 目标和授权范围以当前用户要求及仍有效的明确决定为准; 实现现状以当前文件和必要检查为准; checkpoint 提供此前状态与决策背景. 代码的存在不构成执行或发布授权.
 - `CONTEXT.md` 是当前状态的主要记录, `HISTORY.md` 用于背景追溯; 两者冲突时优先使用当前快照, 已核实的新事实则应明确指出. 不把未经核对的记录或推断表述为已验证事实.
-- 只把 `Work Artifacts` 当作 navigation index. 它不是完整 diff, 不是事实来源.
+- `Relevant Files` 及旧格式的 `Work Artifacts` 只是导航索引, 不是完整 diff 或事实来源.
 
 ## 语言和格式
 
@@ -28,109 +30,89 @@
 - 正文语言优先遵循项目级或用户级指令.
 - 如果没有项目级或用户级语言指令, 正文使用当前对话语言.
 - 这条规则适用于 `CONTEXT.md`, `HISTORY.md` 和回复.
+- 省略不适用的章节和空状态, 不为填满模板写重复的“无”. 优先使用简短单行条目, 不展开长段落或不必要的嵌套列表.
+- 短 checkpoint 不要求 TOC. 需要导航时在一级标题后添加 `## Table of Contents`, 覆盖实际二级章节, 章节变化时同步更新.
 
-## TOC 规则
+## 信息取舍与更新
 
-`CONTEXT.md` 和 `HISTORY.md` 必须包含 `## Table of Contents`. TOC 是 checkpoint 文件结构的一部分, 放在一级标题之后, 正文二级章节之前. `## Table of Contents` 是固定结构标题, 不随正文语言翻译.
-
-TOC 必须列出文件中的所有二级章节. 模板中的 `- ...` 表示按实际章节生成 TOC, 不是要保留的字面内容. 每次追加, 删除或重命名章节时, 必须同步更新 TOC.
+- 保留会影响后续行动, 且无法从现有文件低成本恢复的信息: 用户要求, 决策及理由, 未完成请求, 准确停点, 关键验证结果和现实阻塞. 同一事实只保留一个主要位置.
+- 对可重新读取的代码, `AGENTS.md`, 项目规范, 完整 diff 和长日志使用必要引用, 不重复展开. 仍需记录跨会话可能丢失且影响执行的工作目录, 外部产物位置和任务特有条件; 不假定下一位 agent 会自动得到这些信息.
+- 保留必要路径, 符号, 命令, 错误文本, URL 和标识符的准确写法. 未回答或仍需行动的用户问题与请求继续保留, 引用时保留原话; 已回答或解决的内容不再作为待办携带.
+- 更新时将新信息整合成当前快照. 新的用户决定或已核实事实取代旧记录; 删除已解决, 被取代, 过时或与续接无关的内容, 保留仍有效的要求, 决策和未完成工作. 不因缩短篇幅遗漏尚未执行的请求.
+- 同步 `Work State` 与 `Next Move`: 完成项移出 Active, 已解除的阻塞移出 Blocked, 下一步随当前状态调整. 保留有影响的未提交, 已提交, 已推送, 审查中或已合并状态.
+- 验证记录说明检查对象, 结果和覆盖范围, 标出影响交付的未验证部分. 不把计划写成完成, 不把推断写成事实, 不把旧验证当作后续修改的验证; 保存 checkpoint 本身不要求重新运行测试.
 
 ## CONTEXT.md
 
-`CONTEXT.md` 只保存当前仍然有效, 并且会影响未来工作的当前信息. 使用以下结构:
+`CONTEXT.md` 是可独立支持续接的当前快照. 使用以下结构, 按需省略不适用的章节及状态子章节. 模板中的说明替换为实际内容:
 
 ```md
 # CONTEXT.md
 
-## Table of Contents
+## Objective
 
-- ...
+- 用一到两句说明用户目标及必要的完成条件.
 
-## Current Goal
+## Requirements
 
-## Current State
+- 用户提出的要求, 偏好, 约束和范围边界.
 
-## Confirmed Decisions
+## Decisions
 
-## Active Constraints
+- 已确定的选择及简短理由.
 
-## Known Risks
+## Work State
 
-## Open Questions
+### Completed
 
-## TODO
+- 已完成的目标及相关验证结果和范围.
 
-## Next Actions
+### Active
+
+- 正在处理的目标, 准确停点和未完成部分.
+
+### Blocked
+
+- 阻塞事项, 原因及解除条件.
+
+## Next Move
+
+1. 下一项具体动作及完成条件.
+2. 其余有效的剩余工作, 按执行顺序排列并说明必要依赖.
 
 ## Relevant Files
 
-## Work Artifacts
+- `path/to/file`: 续接或审查需要打开它的原因.
+
+## Important Context
+
+- 续接必需且难以自行重新获取的其他事实.
 ```
 
-Section 含义:
-
-- `Current Goal`: 当前目标.
-- `Current State`: 当前实现状态或会话状态.
-- `Confirmed Decisions`: 仍然有效的决策.
-- `Active Constraints`: 后续工作仍必须遵守的约束.
-- `Known Risks`: 已知风险, 陷阱或注意事项.
-- `Open Questions`: 需要讨论, 调研或验证的问题.
-- `TODO`: 仍然有效的剩余工作池.
-- `Next Actions`: 从 `TODO` 中提炼出的前 1 到 3 个具体下一步动作.
-- `Relevant Files`: 与理解当前会话直接相关的文件, 文件夹或资源.
-- `Work Artifacts`: 本会话创建, 修改, 删除或移动的主要文件. 它是导航索引, 不是完整 diff, 不是完整事实来源.
-
-每次创建或更新 `CONTEXT.md` 时, 必须同步更新 `Table of Contents`, 确保 TOC 列出所有实际存在的二级章节.
-
-### Work Artifacts
-
-使用以下 `Work Artifacts` 条目结构:
-
-```md
-- [Modified] `path/to/file.md`
-  - Briefly explain what changed in this file.
-```
-
-允许的 `Work Artifacts` 动作:
-
-- `[Created]`: 本会话创建了该文件.
-- `[Modified]`: 本会话修改了已有文件.
-- `[Deleted]`: 本会话删除了该文件.
-- `[Moved]`: 本会话移动或重命名了该文件.
-
-每次 `checkpoint-save` 都必须维护 `Work Artifacts`, 但没有工作产物时可以为空.
+- `Requirements` 保存任务特有的要求和仍有效的授权边界, 不复制通用仓库规则.
+- `Work State` 按目标记录结果和停点, 不写逐次编辑日志. 有关的验证及交付状态附在对应事项上.
+- `Next Move` 是唯一的剩余工作清单, 不另设重复的 TODO 或开放问题章节. 尚未回答的问题可作为待确认动作, 已在 Blocked 说明的原因不重复展开.
+- `Relevant Files` 按重要性列出最多 15 个续接入口, 不列出所有读过或改过的文件. 需要时用目录, diff, commit 或 PR 入口定位更大范围; 无版本控制的产物保留必要路径. 文件条目可简述改动, 不另建产物索引. 当前工作目录需要定位时放入 `Important Context`.
+- `Important Context` 只收录其他章节尚未表达且影响续接的必要事实, 如外部系统状态, 难以复现的观察或跨会话定位信息. 仍影响当前工作的历史结论在快照中保留简短提醒及历史引用, 不要求先通读历史才能继续.
 
 ## HISTORY.md
 
-`HISTORY.md` 保存历史摘要, 排障记录, 已拒绝或暂缓方案和推理归档. 使用多条目结构:
+`HISTORY.md` 是可选的历史记录, 仅在有值得追溯的新背景时创建或追加. 普通进度变化只更新 `CONTEXT.md`. 历史保留失败实验的原因与证据, 已拒绝或暂缓方案的取舍, 以及关键决策变化; 不复制当前快照, 不自动收集从快照删下来的所有内容.
+
+每个新条目使用实际日期和简短标题, 正文按需说明当时发生了什么, 依据是什么, 为何改变决定及相关引用. 不强制固定子章节:
 
 ```md
 # HISTORY.md
 
-## Table of Contents
-
-- ...
-
 ## {YYYY-MM-DD} - {entry-title}
 
-### Summary
-
-### Important Findings
-
-### Decisions
-
-### Rejected / Deferred Approaches
-
-### Assumptions
-
-### Notes
+- 值得追溯的事件, 证据及决策理由.
 ```
 
-每个新的 history entry:
+- 日期使用 `YYYY-MM-DD`. 明确区分当时的状态与当前状态, 已拒绝与暂缓的方案, 以及已验证事实与未验证假设; 不要求固定标签.
+- 相同结论或假设没有新证据时不重复追加. 新条目不合并进旧条目, 未经用户要求不清理或重建已有历史, 包括未读取的部分.
 
-- 使用 `YYYY-MM-DD` 格式的实际条目日期.
-- 使用简短描述性的条目标题.
-- 新增一个二级条目. 不要使用重复的 `Entry Date` 或 `Entry Title` 标题.
-- 同步更新 `Table of Contents`, 确保 TOC 列出所有实际存在的二级 history entries.
-- 显式标记已拒绝和已暂缓项, 例如 `[Rejected]` 或 `[Deferred]`.
-- 显式标记假设, 例如 `[Verified]` 或 `[Unverified]`.
+## 旧格式兼容
+
+- 读取兼容旧章节名, `Work Artifacts` 和旧历史条目结构; 不因缺少新章节, TOC 或可选的 `HISTORY.md` 判断记录损坏.
+- 用户要求保存且有实质更新时才按当前结构整理该会话的 `CONTEXT.md`, 保留仍有效的要求, 决策和未完成请求; 不批量迁移其他 checkpoint 或重写已有历史. 单独读取不改写文件.

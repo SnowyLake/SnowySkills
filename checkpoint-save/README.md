@@ -59,10 +59,16 @@ Saving distinguishes an identified, absent, or ambiguous current session folder.
 
 Checkpoint files record session context:
 
-- `CONTEXT.md`: Stores only current, still-valid information that affects future work, including the current goal, current state, confirmed decisions, active constraints, known risks, open questions, TODO, next actions, relevant files, and work artifacts.
-- `HISTORY.md`: Stores historical summaries, troubleshooting records, rejected or deferred approaches, assumptions, and notes.
+- `CONTEXT.md`: Stores the current objective, requirements, decisions, work state, next actions, relevant files, and essential context for continuation.
+- `HISTORY.md`: Optional history for failure evidence, rejected or deferred approaches, and important decision changes. Ordinary progress updates belong only in `CONTEXT.md`.
 
-`CONTEXT.md` is the primary reading entry point. `HISTORY.md` is consulted for relevant background; saving also checks recent relevant entries before deciding what to append.
+`CONTEXT.md` is the primary reading entry point. `HISTORY.md` is consulted for relevant background; saving checks existing relevant entries before deciding what to append. Its absence is normal.
+
+The snapshot follows the seven sections from [OpenCode v2.3.0 session compaction](https://github.com/anomalyco/opencode/blob/v2.3.0/packages/core/src/session/compaction.ts#L173-L254): `Objective`, `Requirements`, `Decisions`, `Work State`, `Next Move`, `Relevant Files`, and `Important Context`. `Work State` groups completed, active, and blocked goals. Inapplicable sections can be omitted, and short checkpoints need no table of contents.
+
+The file workflow adds explicit validation results and coverage, plus working-directory or external-artifact locations needed across sessions. Recoverable code and repository rules are referenced instead of restated. Unresolved requests remain in the snapshot; resolved or stale material is removed. `Relevant Files` lists at most 15 useful entry points, using directories or diff references for larger scopes rather than maintaining a second artifact list. See the [shared contract](references/checkpoint-contract.md) for the template and update rules.
+
+Reading supports older headings and history layouts without rewriting them. A later save with substantive updates organizes that session's snapshot using the current structure; it does not migrate other checkpoints or rewrite existing history.
 
 ## Usage Examples
 
@@ -84,8 +90,9 @@ Use checkpoint-read to read .agent-sessions/20260605-example-session and review 
 - Reading another session does not change the save destination. A shared folder becomes the current session folder only when the user explicitly designates it as such.
 - Reads the current snapshot and recent relevant history, expanding historical reading only when needed.
 - Preserves information that is costly or impossible to recover from project files: user decisions and scope, reasons, unfinished work, validation coverage, and unresolved assumptions.
-- Maintains a clean `CONTEXT.md` snapshot and its `Work Artifacts`. Creates both files on the first save; later appends a history entry only for substantive changes or useful new background.
-- Preserves existing history, including unread entries. If both files are complete and nothing substantive changed, leaves them unchanged. If a file is missing, fills in confirmed information and reports the gap without inventing lost history.
+- Maintains a concise snapshot, reconciles work state with next actions, and removes resolved or stale content while preserving outstanding requests. Validation records include their scope and any relevant gaps; saving does not itself require rerunning tests.
+- Creates `CONTEXT.md` on the first save. Creates or appends `HISTORY.md` only for new background worth tracing, without repeating routine progress or automatically archiving everything removed from the snapshot.
+- Preserves existing history, including unread entries. If nothing substantive changed, leaves the files unchanged, including older snapshots. Missing optional history is normal; a missing snapshot or known information loss is reported, and only confirmed information is reconstructed.
 - Uses current user instructions for goals and authorization, current files and checks for implementation facts, and checkpoints for prior state and decision context.
 - Confirms the required writes and structure, then briefly reports the session path, updated files, key changes, and unresolved matters. Reports partial writes honestly. Does not repeat the snapshot unless requested.
 
@@ -95,13 +102,13 @@ Use checkpoint-read to read .agent-sessions/20260605-example-session and review 
 
 - Uses the current session folder when no path is provided, or the specified folder otherwise. Asks for a path if neither is clear.
 - Allows reading another session even when the current session already has a checkpoint. Keeps the source folder separate from the current session folder and leaves the save destination unchanged.
-- Reads `CONTEXT.md` first, uses `Work Artifacts` to locate prior work, and consults relevant history only when needed.
+- Reads `CONTEXT.md` first, uses `Relevant Files` to locate related work, and consults relevant history only when needed. Older headings and `Work Artifacts` remain readable; the new template is not a prerequisite for reading.
 - Checks only project facts that affect the current request. Distinguishes recorded context, verified current facts, and inference instead of re-investigating the entire project just to read a checkpoint.
 - Reads `CONTEXT.md` alone when available. If only `HISTORY.md` exists, reconstructs background and reports the missing current snapshot without treating old history as current state. If neither exists, reports that no checkpoint is available.
 - Uses the shared information-source rules to handle conflicts. Reports material gaps or uncertainty without modifying the source files.
 - Briefly reports the source, its goal and progress, and constraints or blockers relevant to the current request. Expands the status only when requested; explains uncertainty only when relevant.
 - Ends after a standalone read request. When the user also requests review, continuation, or answers, proceeds with that authorized work without asking again. Checkpoint TODOs alone do not authorize execution; work that depends on incomplete reading or missing critical information does not start.
-- For review, checks actual files, changes, and necessary validation. `Work Artifacts` is only a navigation index; checkpoint completion claims and validation reports do not replace independent review.
+- For review, checks actual files, changes, and necessary validation. File indexes only help locate the work; checkpoint completion claims and validation reports do not replace independent review.
 
 ## Reference Workflows
 
