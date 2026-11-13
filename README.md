@@ -6,7 +6,7 @@ Language: English | [中文](README.zh-CN.md)
 
 - [Overview](#overview)
 - [Available Skills](#available-skills)
-  - [snowy-review](#snowy-review)
+  - [engineering-review](#engineering-review)
   - [checkpoint](#checkpoint)
   - [cursor-cli](#cursor-cli)
   - [grok-cli](#grok-cli)
@@ -24,7 +24,7 @@ Each skill lives under `<skill-name>/` at the repository root as a self-containe
 
 ## Available Skills
 
-### [snowy-review](snowy-review/SKILL.md)
+### [engineering-review](engineering-review/SKILL.md)
 
 Review cumulative changes for the current task or a specified file, module, system, or whole project. Give equal attention to correctness, performance and resource costs, and unnecessary, redundant, or overly complex code; use other relevant skills when helpful without changing the requested scope or authorization.
 
@@ -94,7 +94,7 @@ SnowyAgentSkills/
 |   |-- SKILL.md
 |   |-- agents/
 |   `-- references/
-|-- snowy-review/
+|-- engineering-review/
 |-- checkpoint-read/
 |-- cursor-cli/
 |-- grok-cli/

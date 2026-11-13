@@ -1,0 +1,4 @@
+interface:
+  display_name: "Engineering Review"
+  short_description: "审阅当前任务累计改动或指定模块与项目, 同等检查正确性、性能与冗余实现"
+  default_prompt: "使用 $engineering-review 审阅当前任务累计改动或指定范围, 检查正确性、性能和冗余复杂度."

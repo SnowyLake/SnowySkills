@@ -6,7 +6,7 @@
 
 - [概览](#概览)
 - [可用 Skills](#可用-skills)
-  - [snowy-review](#snowy-review)
+  - [engineering-review](#engineering-review)
   - [checkpoint](#checkpoint)
   - [cursor-cli](#cursor-cli)
   - [grok-cli](#grok-cli)
@@ -24,7 +24,7 @@ SnowyAgentSkills 是一个可复用 agent skills 集合仓库.
 
 ## 可用 Skills
 
-### [snowy-review](snowy-review/SKILL.md)
+### [engineering-review](engineering-review/SKILL.md)
 
 审阅当前任务累计改动或指定文件、模块、系统乃至整个项目, 同等重视逻辑正确性、性能与资源开销, 以及无用、冗余、过度复杂实现. 按需使用其他相关 skill, 保持用户指定的范围与操作授权.
 
@@ -94,7 +94,7 @@ SnowyAgentSkills/
 |   |-- SKILL.md
 |   |-- agents/
 |   `-- references/
-|-- snowy-review/
+|-- engineering-review/
 |-- checkpoint-read/
 |-- cursor-cli/
 |-- grok-cli/
